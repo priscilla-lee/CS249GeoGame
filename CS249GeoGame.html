@@ -3,24 +3,198 @@
 </head>
 
 <body>
-	<div id="topbar">
-		<div id="title" class="inbar">FIND PLACES AROUND THE WORLD</div>
-		<div id="index" class="inbar">
-			<div id="current" class="index"></div>
-			<button id="backB" class="index">&lt;</button>
-			<button id="nextB" class="index">&gt;</button>
-		</div>
-		<div id="check" class="inbar">
-			<div id="solved" class="check"></div>
-			<button id="checkB" class="check">Check</button>
-		</div>
-		<div id="status" class="inbar"></div>
-		<button id="streetToggleB" class="inbar">Street<br>Toggle</button>
-		<button id="hintB" class="inbar">Hint<br>please!</button>
+	<div style="padding: 0px !important" class="container-fluid">
+		{{#if currentUser}}
+			{{#if displayHome}}{{> home}}{{/if}}
+			{{#if displayGame}}{{> game}}{{/if}}
+		{{else}}
+			{{> plsLogin}}
+		{{/if}}
 	</div>
-	<div id="static-maps"></div>
-	<div id="map-canvas"></div> <!--will contain the map object-->
-	<div id="hints"></div>
-</body> 
+</body>
 
+<template name="plsLogin">
+	{{> nav}}
+	<div class="jumbotron">
+		<h1>Geography Game</h1>
+		<p>Please log in.</p>
+	</div>
+</template>
 
+<template name="home">
+	{{> nav}}
+	<div class="well col-md-6 col-md-offset-3">
+		<div class="btn btn-block btn-info btn-lg" id="playGame">Play Game</div>
+		{{> stats}}
+		{{> list}}
+		{{> instructions}}
+	</div>
+</template>
+
+<template name="nav">
+	<div class="navbar navbar-default" role="navigation">
+		<div class="navbar-header">
+			<a class="navbar-brand pointer">Geo Game</a>
+		</div>
+		<div class="navbar-collapse collapse">
+			<ul class="nav navbar-nav navbar-right">{{> loginButtons}}</ul>
+		</div>
+	</div>
+</template>
+
+<template name="game">
+	<div class="col-md-6" id="staticmap"><img src="{{staticmap}}" width="100%" height="100%"></div>
+	<div class="col-md-6">{{> streetView}}</div>
+	<div class="col-md-6" id="mapcanvas">{{> map}}</div>
+	{{> gameButtons}}
+	{{> next}}
+</template>
+
+<template name="map">
+  <div class="map-container">
+    {{> googleMap name="map" options=mapOptions}}
+  </div>
+</template>
+
+<template name="streetView">
+  <div class="map-container">
+    {{> googleMap type="StreetViewPanorama" name="streetView" options=mapOptions}}
+  </div>
+</template>
+
+<template name="next">
+	<div class="modal fade" id="nextModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			<h4 class="modal-title" id="myModalLabel">Nice job!</h4>
+		  </div>
+		  <div class="modal-body">
+			You found {{placeName}}!
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			<button type="button" class="btn btn-primary" id="nextlevel">Next</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
+</template>
+
+<template name="gameButtons">
+	<div class="btn-group btn-group-justified" id="gameButtons">
+		<div class="btn btn-info btn-lg goHome">Return Home</div>
+		<div class="btn btn-primary btn-lg streetView">Street View</div>
+		<div class="btn btn-success btn-lg getHint">Hints</div>
+		<div class="btn btn-warning btn-lg userScore">Score</div>
+	</div>
+</template>
+
+<template name="stats">
+	<div class="btn btn-block btn-primary btn-lg" data-toggle="modal" data-target="#statsModal">Stats</div>
+
+	<div class="modal fade bs-example-modal-lg" id="statsModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+	  <div class="modal-dialog modal-lg modalmargins">
+		<div class="modal-content modalwidth">
+		  <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			<h4 class="modal-title" id="myModalLabel">Stats</h4>
+		  </div>
+		  <div class="modal-body">
+			<div class="container-fluid">
+			<div class="col-md-5">
+				<table class="table table-striped table-hover ">
+				  <thead>
+					<tr>
+					  <th></th>
+					  <th>Name</th>
+					  <th>Score</th>
+					</tr>
+				  </thead>
+				  <tbody>
+					<tr class="danger">
+					  <td>1</td>
+					  <td>Adam</td>
+					  <td>21</td>
+					</tr>
+					<tr class="warning">
+					  <td>2</td>
+					  <td>Bill</td>
+					  <td>19</td>
+					</tr>
+					<tr class="success">
+					  <td>3</td>
+					  <td>Chris</td>
+					  <td>17</td>
+					</tr>
+					<tr class="info">
+					  <td>4</td>
+					  <td>Dan</td>
+					  <td>13</td>
+					</tr>
+					<tr class="active">
+					  <td>5</td>
+					  <td>Ethan</td>
+					  <td>10</td>
+					</tr>
+				  </tbody>
+				</table> 			
+			</div>
+			<div class="col-md-7">
+				<div class="well">D3.js visualizations</div>
+			</div>
+		  </div>
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			<button type="button" class="btn btn-primary">Save changes</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
+</template>
+
+<template name="list">
+	<div class="btn btn-block btn-success btn-lg" data-toggle="modal" data-target="#listModal">List</div>
+
+	<div class="modal fade bs-example-modal-lg" id="listModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+	  <div class="modal-dialog modal-lg modalmargins">
+		<div class="modal-content modalwidth">
+		  <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			<h4 class="modal-title" id="myModalLabel">List</h4>
+		  </div>
+		  <div class="modal-body">
+			...
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			<button type="button" class="btn btn-primary">Save changes</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
+</template>
+
+<template name="instructions">
+	<div class="btn btn-block btn-warning btn-lg" data-toggle="modal" data-target="#instructionsModal">Instructions</div>
+
+	<div class="modal fade bs-example-modal-lg" id="instructionsModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+	  <div class="modal-dialog modal-lg modalmargins">
+		<div class="modal-content modalwidth">
+		  <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			<h4 class="modal-title" id="myModalLabel">Instructions</h4>
+		  </div>
+		  <div class="modal-body">
+			Instructions will go here...
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			<button type="button" class="btn btn-primary">Save changes</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
+</template>

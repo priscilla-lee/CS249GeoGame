@@ -1,5 +1,36 @@
 /* CSS declarations go here */
-html, body { 
+
+.btn-block {
+	margin-top: 10px !important;
+}
+
+.modalmargins {
+	margin-left: 50px !important;
+	margin-right: 50px !important;
+}
+
+.modalmargins > .modalwidth {
+	width: 1260px !important;
+}
+
+.map-container {
+  width: 100%;
+  max-width: 100%;
+  height: 100vh;
+}
+
+#staticmap, #mapcanvas {
+	padding: 0px !important;
+}
+
+#gameButtons {
+	position: fixed;
+	bottom: 0px;
+	right: 0px;
+	
+}
+
+/* html, body { 
     height: 100%; 
 	width: 100%;
     margin: 0; 
@@ -156,3 +187,4 @@ html, body {
 	line-height: 90px;
 	background-color: #FF946A;
 }
+ */

@@ -1,15 +1,3 @@
-/* Filename: am3.js
-Author: Priscilla Lee
-Date: Feb 27, 2015
-Goal: Javascript code for implementing an app that works with the Google Maps API, the 
-Static Maps API, and the Street View API.
-
-Honor Code Statement:
-On this task I collaborated with Ella Chao and Audrey Elkus. Ella showed me how to
-use the cool slideUp() and slideDown() methods. Eni helped me figure out how to
-get around the geocoding limit.
-*/
-
 //hide the hints bar right away
 $("#hints").slideUp();
 	
@@ -66,18 +54,16 @@ function initialize() {
 	$("#solved").html("<p>Solved: 0/"+places.length+"</p>");
 }
 
-/* This line of code is very important! */
+//This line of code is very important!
 google.maps.event.addDomListener(window, 'load', initialize);
 
-/* We need to delay to avoid reaching google's geocoding limit of 10 requests per second */
+//We need to delay to avoid reaching google's geocoding limit of 10 requests per second
 function createPlaceWithDelay(place, delay) {
 	setTimeout(function(){createPlaceByName(place);}, delay*1000);
 }
 
-/*
-This function geocodes the given place and adds more properties to the
-correct Place object (latlng, addressComponents, staticURL, streetView, marker, answerOverlay, hintsIndex)
-*/
+//This function geocodes the given place and adds more properties to the
+//correct Place object (latlng, addressComponents, staticURL, streetView, marker, answerOverlay, hintsIndex)
 function createPlaceByName(place){
 	geocoder.geocode( { 'address': place.name}, function(results, status) {
 	  if (status == google.maps.GeocoderStatus.OK) {
