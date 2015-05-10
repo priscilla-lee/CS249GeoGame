@@ -2,19 +2,14 @@ Markers = new Mongo.Collection('markers');
 Places = new Mongo.Collection('places');
 
 var markers = {};
-var index = 0;
 
-var placeNames = ["Sydney Opera House", "Stanford University", "Statue of Liberty New York", "Taj Mahal", 
-	"The Colosseum", "Stonehenge", "The Golden Gate Bridge", "The Eiffel Tower, Paris France",
-	"Machu Picchu in Peru", "Big Ben in London", "Tower of Pisa, Italy"];
-
-var baseURL = "https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=600x600&maptype=satellite&center=";
-	
 if (Meteor.isClient) {
 	$('#nextModal').modal({ show: false})
 	
 	Session.set('currentPage', 'home');
-	Session.set('currentPlace', placeNames[index++]); //'Sydney Opera House');
+	Meteor.call("nextRandomPlace", Meteor.userId(), function(error, result) {
+		Session.set("currentPlace", result);	
+	});
 	Session.set('currentView', 'static');
 	
 	Template.body.helpers({
@@ -32,6 +27,12 @@ if (Meteor.isClient) {
 		"click #viewInstructions": function() {Session.set('currentPage', 'instructions');}
     });
 	
+	Template.gameButtons.helpers({
+		userscore: function() {
+			return Places.find({solvedBy: {$in: [Meteor.userId()]}}).fetch().length;
+		}
+	});
+	
 	Template.gameButtons.events({
 		"click .goHome": function() {
 			Session.set('currentPage', 'home');
@@ -48,6 +49,13 @@ if (Meteor.isClient) {
 	Template.list.helpers({
 		places: function() {
 			return Places.find({recommended: {$gt: 3}}).fetch();
+		},
+		usersolved: function() {
+			if (Places.findOne({solvedBy: {$in: [Meteor.userId()]}, name: this.name})) {
+				return true;
+			} else {
+				return false;
+			}
 		}
 	});
 	
@@ -87,27 +95,31 @@ if (Meteor.isClient) {
 	Template.next.events({
 		"click #nextlevel": function() {
 			$('#nextModal').modal('hide');
-			
-			//add to solved
-			var place = Places.findOne({name:Session.get('currentPlace')});
-			Places.update(place._id, {$push: {solvedBy: Meteor.userId()}});
 
 			//change color of marker
 			var m = Markers.findOne({place: Session.get("currentPlace")});
-			var marker = markers[m._id];
-			marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
-				
-			//next place
-			Session.set("currentPlace", placeNames[index++]);	
+			markers[m._id].setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
+								
+			//add to solved
+			var place = Places.findOne({name:Session.get('currentPlace')});
+			Places.update(place._id, {$push: {solvedBy: Meteor.userId()}});
+			Markers.update(m._id, {$push: {solvedBy: Meteor.userId()}});
 			
+			//next place
+			Meteor.call("nextRandomPlace", Meteor.userId(), function(error, result) {
+				Session.set("currentPlace", result);
+			});
+						
 			//set new street view
 			var sv = GoogleMaps.maps.streetView.instance;
+			place = Places.findOne({name:Session.get('currentPlace')})
 			sv.setPosition({lat: place.geocode.latitude, lng: place.geocode.longitude});
 			google.maps.event.trigger(sv, 'resize'); 
 			
 			//reset zoom level 
 			var map = GoogleMaps.maps.map.instance;
 			map.setZoom(1);
+			
 		}
 	});
 	
@@ -148,6 +160,10 @@ if (Meteor.isClient) {
 					id: document._id,
 					icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
 				  });
+				  
+				  if (document.solvedBy.indexOf(Meteor.userId())!=-1) {
+					marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
+				  }
 
 				  markers[document._id] = marker;
 				},
@@ -194,6 +210,14 @@ if (Meteor.isClient) {
 
 if (Meteor.isServer) {
 	var geo = new GeoCoder();
+	
+		
+	var placeNames = ["Sydney Opera House", "Stanford University", "Statue of Liberty New York", "Taj Mahal", 
+		"The Colosseum", "Stonehenge", "The Golden Gate Bridge", "The Eiffel Tower, Paris France",
+		"Machu Picchu in Peru", "Big Ben in London", "Tower of Pisa, Italy"];
+
+	var baseURL = "https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=600x600&maptype=satellite&center=";
+	
 
 	if (Places.find().fetch().length==0) {
 		for (var i in placeNames) {
@@ -213,7 +237,8 @@ if (Meteor.isServer) {
 			Markers.insert({ 
 				lat: result.latitude, 
 				lng: result.longitude,
-				place: name
+				place: name,
+				solvedBy: []
 			});
 		}
 	}
@@ -257,6 +282,18 @@ if (Meteor.isServer) {
 			}; 
 			
 			return (distance.lat + distance.lng);
+		},
+		"nextRandomPlace": function(userId) {
+			var all = Places.find().fetch();
+			var unsolved = all.filter(function(i) {
+				return Places.findOne({solvedBy: {$in: [userId]}, name: i.name})==undefined;
+			});
+			
+			var range = unsolved.length;
+			//random num from 0 to range
+			var random = Math.floor(Math.random()*(range));
+			return unsolved[random].name;
+			
 		}
 	});
 }

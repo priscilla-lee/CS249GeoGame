@@ -85,7 +85,7 @@
 		<div class="btn btn-info btn-lg goHome">Return Home</div>
 		<div class="btn btn-primary btn-lg streetView">Street View</div>
 		<div class="btn btn-success btn-lg getHint">Hints</div>
-		<div class="btn btn-warning btn-lg userScore">Score</div>
+		<div class="btn btn-warning btn-lg userScore">Score: {{userscore}}</div>
 	</div>
 </template>
 
@@ -168,7 +168,13 @@
 					<tbody>
 					{{#each places}}
 					<tr>
-						<td>{{this.name}}</td>
+						<td>
+						{{#if usersolved}}
+							{{this.name}}
+						{{else}}
+							???
+						{{/if}}
+						</td>
 					</tr>
 					{{/each}}
 					</tbody>
