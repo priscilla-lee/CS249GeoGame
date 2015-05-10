@@ -11,6 +11,19 @@
 	width: 1260px !important;
 }
 
+#listModal .modal{
+    display: block !important;
+}
+
+#listModal .modal-dialog{
+      overflow-y: initial !important
+}
+
+#listModal .modal-body{
+  height: 250px;
+  overflow-y: auto;
+}
+
 .map-container {
   width: 100%;
   max-width: 100%;

@@ -1,6 +1,5 @@
 Markers = new Mongo.Collection('markers');
 Places = new Mongo.Collection('places');
-
 var markers = {};
 
 if (Meteor.isClient) {
@@ -43,6 +42,9 @@ if (Meteor.isClient) {
 			} else {
 				Session.set("currentView", "static");
 			}
+		}, 
+		"click .userScore": function() {
+			$('#listModal').modal('show');
 		}
     });
 	
@@ -59,7 +61,13 @@ if (Meteor.isClient) {
 		}
 	});
 	
-	Template.list.events({
+	Template.recommend.helpers({
+		places: function() {
+			return Places.find({recommended: {$gt: 3}}).fetch();
+		}
+	});
+	
+	Template.recommend.events({
 		"click .recPlace": function() {
 			var placeName = document.getElementById("placeRec").value;
 			Meteor.call("recommendPlace", placeName);

@@ -26,7 +26,7 @@
 	<div class="well col-md-6 col-md-offset-3">
 		<div class="btn btn-block btn-info btn-lg" id="playGame">Play Game</div>
 		{{> stats}}
-		{{> list}}
+		{{> recommend}}
 		{{> instructions}}
 	</div>
 </template>
@@ -87,6 +87,7 @@
 		<div class="btn btn-success btn-lg getHint">Hints</div>
 		<div class="btn btn-warning btn-lg userScore">Score: {{userscore}}</div>
 	</div>
+	{{> list}}
 </template>
 
 <template name="stats">
@@ -152,9 +153,42 @@
 	</div>
 </template>
 
-<template name="list">
-	<div class="btn btn-block btn-success btn-lg" data-toggle="modal" data-target="#listModal">List</div>
 
+<template name="recommend">
+	<div class="btn btn-block btn-success btn-lg" data-toggle="modal" data-target="#recommendModal">List</div>
+
+	<div class="modal fade bs-example-modal-lg" id="recommendModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+	  <div class="modal-dialog modal-lg modalmargins">
+		<div class="modal-content modalwidth">
+		  <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			<h4 class="modal-title" id="myModalLabel">List</h4>
+		  </div>
+		  <div class="modal-body">
+			<div class="container-fluid">
+				<table class="table">
+					<tbody>
+					{{#each places}}
+					<tr><td>{{this.name}}</td></tr>
+					{{/each}}
+					</tbody>
+				</table>
+			</div>
+		  </div>
+		  <div class="modal-footer">
+			<div class="input-group">
+				<input type="text" class="form-control" id="placeRec" name="placeRec" placeHolder="Recommend a new location">
+				<span class="input-group-btn">
+					<button class="btn btn-primary recPlace" type="button">Recommend</button>
+				</span>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	</div>
+</template>
+
+<template name="list">
 	<div class="modal fade bs-example-modal-lg" id="listModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 	  <div class="modal-dialog modal-lg modalmargins">
 		<div class="modal-content modalwidth">
@@ -179,14 +213,6 @@
 					{{/each}}
 					</tbody>
 				</table>
-			</div>
-		  </div>
-		  <div class="modal-footer">
-			<div class="input-group">
-				<input type="text" class="form-control" id="placeRec" name="placeRec" placeHolder="Recommend a new location">
-				<span class="input-group-btn">
-					<button class="btn btn-primary recPlace" type="button">Recommend</button>
-				</span>
 			</div>
 		  </div>
 		</div>
