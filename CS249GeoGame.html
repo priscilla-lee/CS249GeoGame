@@ -43,8 +43,8 @@
 </template>
 
 <template name="game">
-	<div class="col-md-6" id="staticmap"><img src="{{staticmap}}" width="100%" height="100%"></div>
-	<div class="col-md-6">{{> streetView}}</div>
+	<div class="col-md-6" style="display: {{displaySM}};" id="staticmap"><img src="{{staticmap}}" width="100%" height="100%"></div>
+	<div class="col-md-6" style="display: {{displaySV}};" id="streetview">{{> streetView}}</div>
 	<div class="col-md-6" id="mapcanvas">{{> map}}</div>
 	{{> gameButtons}}
 	{{> next}}
@@ -57,24 +57,22 @@
 </template>
 
 <template name="streetView">
-  <div class="map-container">
-    {{> googleMap type="StreetViewPanorama" name="streetView" options=mapOptions}}
+  <div class="map-container" id="sv-container">
+    {{> googleMap type="StreetViewPanorama" id="streetView" name="streetView" options=mapOptions}}
   </div>
 </template>
 
 <template name="next">
-	<div class="modal fade" id="nextModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+	<div class="modal fade" id="nextModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
 	  <div class="modal-dialog">
 		<div class="modal-content">
 		  <div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 			<h4 class="modal-title" id="myModalLabel">Nice job!</h4>
 		  </div>
 		  <div class="modal-body">
 			You found {{placeName}}!
 		  </div>
 		  <div class="modal-footer">
-			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 			<button type="button" class="btn btn-primary" id="nextlevel">Next</button>
 		  </div>
 		</div>
@@ -147,8 +145,7 @@
 		  </div>
 		  </div>
 		  <div class="modal-footer">
-			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-			<button type="button" class="btn btn-primary">Save changes</button>
+			<button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
 		  </div>
 		</div>
 	  </div>
@@ -166,11 +163,25 @@
 			<h4 class="modal-title" id="myModalLabel">List</h4>
 		  </div>
 		  <div class="modal-body">
-			...
+			<div class="container-fluid">
+				<table class="table">
+					<tbody>
+					{{#each places}}
+					<tr>
+						<td>{{this.name}}</td>
+					</tr>
+					{{/each}}
+					</tbody>
+				</table>
+			</div>
 		  </div>
 		  <div class="modal-footer">
-			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-			<button type="button" class="btn btn-primary">Save changes</button>
+			<div class="input-group">
+				<input type="text" class="form-control" id="placeRec" name="placeRec" placeHolder="Recommend a new location">
+				<span class="input-group-btn">
+					<button class="btn btn-primary recPlace" type="button">Recommend</button>
+				</span>
+			</div>
 		  </div>
 		</div>
 	  </div>
@@ -188,11 +199,12 @@
 			<h4 class="modal-title" id="myModalLabel">Instructions</h4>
 		  </div>
 		  <div class="modal-body">
-			Instructions will go here...
+			Instructions will go here...The goal of the game is to explore the 
+			zoomable google maps window (on the right) until its image matches the 
+			static image of the famous place (on the left). 
 		  </div>
 		  <div class="modal-footer">
-			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-			<button type="button" class="btn btn-primary">Save changes</button>
+			<button type="button" class="btn btn-primary" data-dismiss="modal">Got it</button>
 		  </div>
 		</div>
 	  </div>
