@@ -1,5 +1,6 @@
 Markers = new Mongo.Collection('markers');
 Places = new Mongo.Collection('places');
+Pictures = new Mongo.Collection('pictures');
 var markers = {};
 
 if (Meteor.isClient) {
@@ -42,6 +43,14 @@ if (Meteor.isClient) {
 			} else {
 				Session.set("currentView", "static");
 			}
+			
+			setTimeout(function(){ 
+				var sv = GoogleMaps.maps.streetView.instance;
+				place = Places.findOne({name:Session.get('currentPlace')});
+				sv.setPosition({lat: place.geocode.latitude, lng: place.geocode.longitude});
+				google.maps.event.trigger(sv, 'resize'); 
+			}, 500);
+		
 		}, 
 		"click .userScore": function() {
 			$('#listModal').modal('show');
@@ -106,7 +115,8 @@ if (Meteor.isClient) {
 
 			//change color of marker
 			var m = Markers.findOne({place: Session.get("currentPlace")});
-			markers[m._id].setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
+			markers[m._id].setIcon("https://storage.googleapis.com/support-kms-prod/SNP_2752129_en_v0");
+			//'http://maps.google.com/mapfiles/ms/icons/green-dot.png')
 								
 			//add to solved
 			var place = Places.findOne({name:Session.get('currentPlace')});
@@ -116,18 +126,17 @@ if (Meteor.isClient) {
 			//next place
 			Meteor.call("nextRandomPlace", Meteor.userId(), function(error, result) {
 				Session.set("currentPlace", result);
+				
+				//set new street view
+				var sv = GoogleMaps.maps.streetView.instance;
+				place = Places.findOne({name:Session.get('currentPlace')})
+				sv.setPosition({lat: place.geocode.latitude, lng: place.geocode.longitude});
+				google.maps.event.trigger(sv, 'resize'); 
+				
+				//reset zoom level 
+				var map = GoogleMaps.maps.map.instance;
+				map.setZoom(1);
 			});
-						
-			//set new street view
-			var sv = GoogleMaps.maps.streetView.instance;
-			place = Places.findOne({name:Session.get('currentPlace')})
-			sv.setPosition({lat: place.geocode.latitude, lng: place.geocode.longitude});
-			google.maps.event.trigger(sv, 'resize'); 
-			
-			//reset zoom level 
-			var map = GoogleMaps.maps.map.instance;
-			map.setZoom(1);
-			
 		}
 	});
 	
@@ -166,11 +175,13 @@ if (Meteor.isClient) {
 					position: new google.maps.LatLng(document.lat, document.lng),
 					map: map.instance,
 					id: document._id,
-					icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+					icon: "https://storage.googleapis.com/support-kms-prod/SNP_2752125_en_v0"
+					//'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
 				  });
 				  
 				  if (document.solvedBy.indexOf(Meteor.userId())!=-1) {
-					marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
+					marker.setIcon("https://storage.googleapis.com/support-kms-prod/SNP_2752129_en_v0");
+					//'http://maps.google.com/mapfiles/ms/icons/green-dot.png')
 				  }
 
 				  markers[document._id] = marker;
@@ -214,6 +225,34 @@ if (Meteor.isClient) {
 			}
 		}
 	});  
+	
+	Template.streetView.events({
+		"click #picBtn": function() {
+			var sv = GoogleMaps.maps.streetView.instance;	
+			var URL = "https://maps.googleapis.com/maps/api/streetview?size=600x400";
+			URL += "&pano=" + sv.pano;
+			URL += "&heading=" + sv.pov.heading;
+			URL += "&pitch=" + sv.pov.pitch;
+			console.log(URL);
+			
+			Session.set("pic", URL);
+			$('#picModal').modal('show');
+			
+			Pictures.insert({user: Meteor.userId(), pic: URL});
+		}
+	});
+	
+	Template.pic.helpers({
+		svPic: function() {
+			return Session.get("pic");
+		}
+	});
+	
+	Template.photoalbum.helpers({
+		userPics: function() {
+			return Pictures.find({user: Meteor.userId()}).fetch();
+		}
+	});
 }
 
 if (Meteor.isServer) {

@@ -16,12 +16,18 @@
 }
 
 #listModal .modal-dialog{
-      overflow-y: initial !important
+    overflow-y: initial !important;
 }
 
 #listModal .modal-body{
-  height: 250px;
   overflow-y: auto;
+  height: 75vh;
+}
+
+#picBtn {
+	position: absolute;
+	top: 0px;
+	right: 0px;
 }
 
 .map-container {

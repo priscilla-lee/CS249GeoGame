@@ -27,6 +27,7 @@
 		<div class="btn btn-block btn-info btn-lg" id="playGame">Play Game</div>
 		{{> stats}}
 		{{> recommend}}
+		{{> photoalbum}}
 		{{> instructions}}
 	</div>
 </template>
@@ -59,6 +60,10 @@
 <template name="streetView">
   <div class="map-container" id="sv-container">
     {{> googleMap type="StreetViewPanorama" id="streetView" name="streetView" options=mapOptions}}
+	<button type="button" class="btn btn-danger" id="picBtn">
+		<span class="glyphicon glyphicon-camera" aria-hidden="true"></span>
+	</button>
+	{{> pic}}
   </div>
 </template>
 
@@ -155,14 +160,14 @@
 
 
 <template name="recommend">
-	<div class="btn btn-block btn-success btn-lg" data-toggle="modal" data-target="#recommendModal">List</div>
+	<div class="btn btn-block btn-success btn-lg" data-toggle="modal" data-target="#recommendModal">Recommend</div>
 
 	<div class="modal fade bs-example-modal-lg" id="recommendModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 	  <div class="modal-dialog modal-lg modalmargins">
 		<div class="modal-content modalwidth">
 		  <div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-			<h4 class="modal-title" id="myModalLabel">List</h4>
+			<h4 class="modal-title" id="myModalLabel">Recommend</h4>
 		  </div>
 		  <div class="modal-body">
 			<div class="container-fluid">
@@ -188,13 +193,39 @@
 	</div>
 </template>
 
-<template name="list">
-	<div class="modal fade bs-example-modal-lg" id="listModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<template name="photoalbum">
+	<div class="btn btn-block btn-warning btn-lg" data-toggle="modal" data-target="#albumModal">Photo Album</div>
+
+	<div class="modal fade bs-example-modal-lg" id="albumModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 	  <div class="modal-dialog modal-lg modalmargins">
 		<div class="modal-content modalwidth">
 		  <div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-			<h4 class="modal-title" id="myModalLabel">List</h4>
+			<h4 class="modal-title" id="myModalLabel">Photo Album</h4>
+		  </div>
+		  <div class="modal-body">
+			<div class="container-fluid">
+				{{#each userPics}}
+				  <div class="col-xs-6 col-md-3">
+					<a href="#" class="thumbnail">
+					  <img src="{{this.pic}}">
+					</a>
+				  </div>
+				{{/each}}
+			</div>
+		  </div>
+		</div>
+	  </div>
+	</div>
+</template>
+
+<template name="list">
+	<div class="modal fade" id="listModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			<h4 class="modal-title" id="myModalLabel">Solved</h4>
 		  </div>
 		  <div class="modal-body">
 			<div class="container-fluid">
@@ -202,13 +233,12 @@
 					<tbody>
 					{{#each places}}
 					<tr>
-						<td>
+						
 						{{#if usersolved}}
-							{{this.name}}
+							<td style="background-color: #93d093"><p class="text-center">{{this.name}}</p></td>
 						{{else}}
-							???
+							<td style="background-color: #ddd"><p class="text-center">???</p></td>
 						{{/if}}
-						</td>
 					</tr>
 					{{/each}}
 					</tbody>
@@ -220,8 +250,20 @@
 	</div>
 </template>
 
+<template name="pic">
+	<div class="modal fade" id="picModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+		<div class="modal-content">
+		  <div class="modal-body">
+			<img src="{{svPic}}" width="100%" height="100%">
+		  </div>
+		</div>
+	  </div>
+	</div>
+</template>
+
 <template name="instructions">
-	<div class="btn btn-block btn-warning btn-lg" data-toggle="modal" data-target="#instructionsModal">Instructions</div>
+	<div class="btn btn-block btn-danger btn-lg" data-toggle="modal" data-target="#instructionsModal">Instructions</div>
 
 	<div class="modal fade bs-example-modal-lg" id="instructionsModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 	  <div class="modal-dialog modal-lg modalmargins">
