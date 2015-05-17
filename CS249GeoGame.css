@@ -3,12 +3,9 @@
 }
 
 .modalmargins {
-	margin-left: 50px !important;
-	margin-right: 50px !important;
-}
-
-.modalmargins > .modalwidth {
-	width: 1260px !important;
+    width: 90% !important;
+    margin-left: 5% !important;
+    margin-right: 5% !important;
 }
 
 #listModal .modal{
@@ -43,6 +40,36 @@
 #gameButtons {
 	position: fixed;
 	bottom: 0px;
-	right: 0px;
-	
+	right: 0px;	
+}
+
+.thumbsUp:hover, .deleteRec:hover {
+	cursor: pointer;
+}
+
+.thumbedUp, .placeName {
+    color: #337ab7; 
+    font-weight: bold;
+}
+
+.overlayContainer {
+    position: relative;   
+}
+
+.overlayContainer:hover > .overlayCaption {
+    visibility: visible;   
+}
+
+.overlayCaption {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    visibility: hidden;
+    background-color: rgba(0,0,0,0.2);
+    color: white;
+    text-align: center;
+    padding-top: 20%;
 }

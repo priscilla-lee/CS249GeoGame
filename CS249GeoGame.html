@@ -1,5 +1,5 @@
 <head>
-  <title>CS249GeoGame</title>
+    <title>CS249GeoGame</title>
 </head>
 
 <body>
@@ -13,6 +13,9 @@
 	</div>
 </body>
 
+<!---------------------------------------------------------------------------------------------
+| NAME Template                 
+---------------------------------------------------------------------------------------------->
 <template name="plsLogin">
 	{{> nav}}
 	<div class="jumbotron">
@@ -21,6 +24,9 @@
 	</div>
 </template>
 
+<!---------------------------------------------------------------------------------------------
+| HOME Template                
+---------------------------------------------------------------------------------------------->
 <template name="home">
 	{{> nav}}
 	<div class="well col-md-6 col-md-offset-3">
@@ -32,6 +38,9 @@
 	</div>
 </template>
 
+<!---------------------------------------------------------------------------------------------
+| NAV Template                  
+---------------------------------------------------------------------------------------------->
 <template name="nav">
 	<div class="navbar navbar-default" role="navigation">
 		<div class="navbar-header">
@@ -43,6 +52,9 @@
 	</div>
 </template>
 
+<!---------------------------------------------------------------------------------------------
+| GAME Template                  
+---------------------------------------------------------------------------------------------->
 <template name="game">
 	<div class="col-md-6" style="display: {{displaySM}};" id="staticmap"><img src="{{staticmap}}" width="100%" height="100%"></div>
 	<div class="col-md-6" style="display: {{displaySV}};" id="streetview">{{> streetView}}</div>
@@ -51,12 +63,18 @@
 	{{> next}}
 </template>
 
+<!---------------------------------------------------------------------------------------------
+| MAP Template                  
+---------------------------------------------------------------------------------------------->
 <template name="map">
   <div class="map-container">
     {{> googleMap name="map" options=mapOptions}}
   </div>
 </template>
 
+<!---------------------------------------------------------------------------------------------
+| STREET VIEW Template                  
+---------------------------------------------------------------------------------------------->
 <template name="streetView">
   <div class="map-container" id="sv-container">
     {{> googleMap type="StreetViewPanorama" id="streetView" name="streetView" options=mapOptions}}
@@ -67,15 +85,32 @@
   </div>
 </template>
 
+<!---------------------------------------------------------------------------------------------
+| NEXT Template                  
+---------------------------------------------------------------------------------------------->
 <template name="next">
 	<div class="modal fade" id="nextModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
 	  <div class="modal-dialog">
 		<div class="modal-content">
-		  <div class="modal-header">
-			<h4 class="modal-title" id="myModalLabel">Nice job!</h4>
-		  </div>
 		  <div class="modal-body">
-			You found {{placeName}}!
+            <h3>You found <span class="placeName">{{placeName}}</span>!</h3><br>
+            <table class="table">
+            <tbody>
+                <tr>
+                    <td>Time solved {{milliseconds}}</td>
+                    <td>{{timePts}} points</td>
+                </tr>
+                <tr>
+                    <td>{{picsTaken}} pictures taken</td>
+                    <td>{{picPts}} points</td>
+                </tr>
+                <tr class="info">
+                    <td>Total</td>
+                    <td>{{totPts}} points</td>
+                </tr>
+            </tbody>
+            </table>
+
 		  </div>
 		  <div class="modal-footer">
 			<button type="button" class="btn btn-primary" id="nextlevel">Next</button>
@@ -85,16 +120,22 @@
 	</div>
 </template>
 
+<!---------------------------------------------------------------------------------------------
+| GAME BUTTONS Template                  
+---------------------------------------------------------------------------------------------->
 <template name="gameButtons">
 	<div class="btn-group btn-group-justified" id="gameButtons">
 		<div class="btn btn-info btn-lg goHome">Return Home</div>
 		<div class="btn btn-primary btn-lg streetView">Street View</div>
-		<div class="btn btn-success btn-lg getHint">Hints</div>
+		<div class="btn btn-success btn-lg getHint">Time {{time}}</div>
 		<div class="btn btn-warning btn-lg userScore">Score: {{userscore}}</div>
 	</div>
 	{{> list}}
 </template>
 
+<!---------------------------------------------------------------------------------------------
+| STATS Template                  
+---------------------------------------------------------------------------------------------->
 <template name="stats">
 	<div class="btn btn-block btn-primary btn-lg" data-toggle="modal" data-target="#statsModal">Stats</div>
 
@@ -103,50 +144,26 @@
 		<div class="modal-content modalwidth">
 		  <div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-			<h4 class="modal-title" id="myModalLabel">Stats</h4>
+			<h4 class="modal-title" id="myModalLabel">High Score Board &amp; Your Stats</h4>
 		  </div>
 		  <div class="modal-body">
 			<div class="container-fluid">
 			<div class="col-md-5">
 				<table class="table table-striped table-hover ">
 				  <thead>
-					<tr>
-					  <th></th>
-					  <th>Name</th>
-					  <th>Score</th>
-					</tr>
+					<tr><th>#</th><th>Name</th><th>Score</th></tr>
 				  </thead>
-				  <tbody>
-					<tr class="danger">
-					  <td>1</td>
-					  <td>Adam</td>
-					  <td>21</td>
-					</tr>
-					<tr class="warning">
-					  <td>2</td>
-					  <td>Bill</td>
-					  <td>19</td>
-					</tr>
-					<tr class="success">
-					  <td>3</td>
-					  <td>Chris</td>
-					  <td>17</td>
-					</tr>
-					<tr class="info">
-					  <td>4</td>
-					  <td>Dan</td>
-					  <td>13</td>
-					</tr>
-					<tr class="active">
-					  <td>5</td>
-					  <td>Ethan</td>
-					  <td>10</td>
-					</tr>
+				  <tbody class="highScores">
+					<tr style="background-color: #5b94c5"><td>1</td><td>{{name1}}</td><td>{{score1}}</td></tr>
+					<tr style="background-color: #84afd3"><td>2</td><td>{{name2}}</td><td>{{score2}}</td></tr>
+					<tr style="background-color: #adc9e2"><td>3</td><td>{{name3}}</td><td>{{score3}}</td></tr>
+                    <tr style="background-color: #d6e4f0"><td>4</td><td>{{name4}}</td><td>{{score4}}</td></tr>
+                    <tr style="background-color: #eaf1f7"><td>5</td><td>{{name5}}</td><td>{{score5}}</td></tr>
 				  </tbody>
 				</table> 			
 			</div>
 			<div class="col-md-7">
-				<div class="well">D3.js visualizations</div>
+                {{> d3}}
 			</div>
 		  </div>
 		  </div>
@@ -158,34 +175,52 @@
 	</div>
 </template>
 
+<!---------------------------------------------------------------------------------------------
+| D3 VISUALIZATIONS Template                  
+---------------------------------------------------------------------------------------------->
+<template name="d3">
+	<div class="well">D3.js visualizations</div>
+</template>
 
+<!---------------------------------------------------------------------------------------------
+| RECOMMEND Template                  
+---------------------------------------------------------------------------------------------->
 <template name="recommend">
 	<div class="btn btn-block btn-success btn-lg" data-toggle="modal" data-target="#recommendModal">Recommend</div>
 
 	<div class="modal fade bs-example-modal-lg" id="recommendModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 	  <div class="modal-dialog modal-lg modalmargins">
 		<div class="modal-content modalwidth">
-		  <div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-			<h4 class="modal-title" id="myModalLabel">Recommend</h4>
-		  </div>
-		  <div class="modal-body">
-			<div class="container-fluid">
-				<table class="table">
-					<tbody>
-					{{#each places}}
-					<tr><td>{{this.name}}</td></tr>
-					{{/each}}
-					</tbody>
-				</table>
-			</div>
-		  </div>
-		  <div class="modal-footer">
-			<div class="input-group">
+		  <div class="modal-header"> 
+                <div class="input-group">
 				<input type="text" class="form-control" id="placeRec" name="placeRec" placeHolder="Recommend a new location">
 				<span class="input-group-btn">
 					<button class="btn btn-primary recPlace" type="button">Recommend</button>
 				</span>
+			</div>
+		  </div>
+		  <div class="modal-body">
+			<div class="container-fluid">
+			
+			
+			{{#each places}}
+			<div class="col-sm-6 col-md-4">
+				<div class="thumbnail">
+				<div class="caption">
+					<h5>
+						<span class="badge" style="background-color: #337ab7">{{this.recommended}}</span>
+						{{this.name}}
+						{{#if canDelete}}
+							<span class="deleteRec glyphicon glyphicon-remove text-right" aria-hidden="true"></span>
+						{{else}}
+							<span class="thumbsUp {{#if thumbedUp}} thumbedUp {{/if}} glyphicon glyphicon-thumbs-up text-right" aria-hidden="true"></span>
+						{{/if}}
+					</h5>
+				</div>
+				<img src="{{this.thumbnail}}">
+				</div>
+			</div>
+			{{/each}}
 			</div>
 		  </div>
 		</div>
@@ -193,6 +228,9 @@
 	</div>
 </template>
 
+<!---------------------------------------------------------------------------------------------
+| PHOTO ALBUM Template                  
+---------------------------------------------------------------------------------------------->
 <template name="photoalbum">
 	<div class="btn btn-block btn-warning btn-lg" data-toggle="modal" data-target="#albumModal">Photo Album</div>
 
@@ -207,9 +245,13 @@
 			<div class="container-fluid">
 				{{#each userPics}}
 				  <div class="col-xs-6 col-md-3">
-					<a href="#" class="thumbnail">
+					<a href="{{this.pic}}" class="thumbnail overlayContainer">
 					  <img src="{{this.pic}}">
+                        <div class="overlayCaption">
+                            <span style="font-size: 300%" class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+                        </div>
 					</a>
+                    
 				  </div>
 				{{/each}}
 			</div>
@@ -219,13 +261,16 @@
 	</div>
 </template>
 
+<!---------------------------------------------------------------------------------------------
+| LIST Template                  
+---------------------------------------------------------------------------------------------->
 <template name="list">
 	<div class="modal fade" id="listModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 	  <div class="modal-dialog">
 		<div class="modal-content">
 		  <div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-			<h4 class="modal-title" id="myModalLabel">Solved</h4>
+			<h4 class="modal-title" id="myModalLabel">Solved {{numSolved}} out of {{numTotal}}</h4>
 		  </div>
 		  <div class="modal-body">
 			<div class="container-fluid">
@@ -233,12 +278,11 @@
 					<tbody>
 					{{#each places}}
 					<tr>
-						
-						{{#if usersolved}}
-							<td style="background-color: #93d093"><p class="text-center">{{this.name}}</p></td>
-						{{else}}
-							<td style="background-color: #ddd"><p class="text-center">???</p></td>
-						{{/if}}
+                    {{#if usersolved}}
+                        <td style="background-color: #93d093"><p class="text-center">{{this.name}} ({{time}})</p></td>
+                    {{else}}
+                        <td style="background-color: #ddd"><p class="text-center">???</p></td>
+                    {{/if}}
 					</tr>
 					{{/each}}
 					</tbody>
@@ -250,6 +294,9 @@
 	</div>
 </template>
 
+<!---------------------------------------------------------------------------------------------
+| PIC Template                  
+---------------------------------------------------------------------------------------------->
 <template name="pic">
 	<div class="modal fade" id="picModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 	  <div class="modal-dialog">
@@ -262,6 +309,9 @@
 	</div>
 </template>
 
+<!---------------------------------------------------------------------------------------------
+| INSTRUCTIONS Template                  
+---------------------------------------------------------------------------------------------->
 <template name="instructions">
 	<div class="btn btn-block btn-danger btn-lg" data-toggle="modal" data-target="#instructionsModal">Instructions</div>
 
