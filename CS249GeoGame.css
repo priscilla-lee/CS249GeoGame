@@ -60,19 +60,6 @@
     visibility: visible;   
 }
 
-.glyphicon-download-alt, .deletePic {
-    color: white !important;   
-    cursor: pointer;
-}
-
-.glyphicon-download-alt:hover {
-    color: #5bc0de !important;  
-}
-
-.deletePic:hover {
-    color: #d9534f !important;   
-}
-
 .overlayCaption {
     position: absolute;
     top: 0px;
@@ -87,48 +74,51 @@
     padding-top: 20%;
 }
 
+.glyphicon-download-alt, .deletePic {
+    color: white !important;   
+    cursor: pointer;
+}
+
+.glyphicon-download-alt:hover {
+    color: #5bc0de !important;  
+}
+
+.deletePic:hover {
+    color: #d9534f !important;   
+}
+
 .bold-yellow {
     font-weight: bold;
     color: #f0ad4e;
 }
 
-
 #d3container {
     font-family:"Helvetica Neue";
     color: #686765;
 }
+
 #d3container .name {
     float:right;
     color:#27aae1;
 }
+
 #d3container .axis {
     fill: none;
     stroke: #AAA;
     stroke-width: 1px;
 }
+
 #d3container text {
     stroke: none;
     fill: #666666;
-    font-size: .6em;
-    font-family:"Helvetica Neue"
 }
+
 #d3container .label {
     fill: #414241;
 }
-#d3container .node {
-    cursor:pointer;
-}
-#d3container .dot {
-    /*opacity: .7;*/
-    cursor: pointer;
-}
 
-#d3container .tooltip {
-  position: absolute;
-  width: 200px;
-  height: 28px;
-  pointer-events: none;
-    font-size: 75%;
+#d3container .node, #d3container .dot {
+    cursor:pointer;
 }
 
 .normalPlayer, .normalPlayer:hover{
