@@ -25,9 +25,38 @@
 ---------------------------------------------------------------------------------------------->
 <template name="plsLogin">
 	{{> nav}}
-	<div class="jumbotron">
-		<h1>Geography Game</h1>
-		<p>Please log in.</p>
+	
+	<div id="carousel-example-generic" class="carousel slide col-md-7" data-ride="carousel">
+		<!-- Indicators -->
+		<ol class="carousel-indicators">
+			<li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+			<li data-target="#carousel-example-generic" data-slide-to="1"></li>
+			<li data-target="#carousel-example-generic" data-slide-to="2"></li>
+		</ol>
+
+		<!-- Wrapper for slides -->
+		<div class="carousel-inner" role="listbox">
+			{{#each carouselImages}}
+			<div class="item {{#if active}}active{{/if}}">
+				<img src="{{this.img}}">
+				<div class="carousel-caption">{{this.caption}}</div>
+			</div>
+			{{/each}}
+		</div>
+
+		<!-- Controls -->
+		<a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+			<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+			<span class="sr-only">Previous</span>
+		</a>
+		<a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+			<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+			<span class="sr-only">Next</span>
+		</a>
+	</div>
+	<div class="col-md-5">
+		Geography Game
+		Please log in!
 	</div>
 </template>
 
@@ -70,10 +99,14 @@
 ---------------------------------------------------------------------------------------------->
 <template name="game">
     {{#if gameDone}}
-        <div class="col-md-12">
-            No puzzles left! You've solved all the challenges! 
-            Recommend more puzzles or wait until more are added! Thanks for playing!
-        </div>
+        <div class="col-md-12 alert alert-dismissible alert-info" style="height: 100vh">
+			<h1><strong>CONGRATULATIONS!</strong></h1>
+			<h3>
+				You've solved all the geography challenges!
+				There are no more puzzles left to solve! You can recommend more puzzles or wait
+				until more are added! Thank you so much for player!
+			</h3>
+		</div>
     {{else}}
         <div class="col-md-6" style="display: {{displaySM}};" id="staticmap"><img src="{{staticmap}}" width="100%" height="100%"></div>
         <div class="col-md-6" style="display: {{displaySV}};" id="streetview">{{> streetView}}</div>

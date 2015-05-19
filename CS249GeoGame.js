@@ -33,13 +33,11 @@ if (Meteor.isClient) {
     Session.set('pauseTime', true);
 	
 	//call next random place when user logs in
-	Tracker.autorun(function() {
-		if (Meteor.user()) {
-			Meteor.call("nextRandomPlace", Meteor.userId(), function(error, result) {
-				console.log("next random place result: " + result);
-				Session.set("currentPlace", result);	
-			});
-		}
+	Accounts.onLogin(function() {
+		Meteor.call("nextRandomPlace", Meteor.userId(), function(error, result) {
+			console.log("next random place result: " + result);
+			Session.set("currentPlace", result);	
+		});
 	});
 	
 	
@@ -68,6 +66,55 @@ if (Meteor.isClient) {
 	Template.body.helpers({
         displayHome: function() {return Session.get('currentPage')=='home';},
         displayGame: function() {return Session.get('currentPage')=='game';},
+    });
+	
+	
+	
+	/******************************************************************************
+    * PLSLOGIN Template
+    ******************************************************************************/
+	Template.plsLogin.helpers({
+        carouselImages: function() {
+			var base = "http://cs.wellesley.edu/~plee3/cs249/IP/screenshots/"
+			var images = [{
+					img: base + "menu-buttons.PNG",
+					caption: "TESTING CAPTIONS",
+					active: true
+				}, {
+					img: base + "game-play.PNG",
+					caption: "TESTING CAPTIONS",
+					active: false
+				}, {
+					img: base + "game-success.PNG",
+					caption: "TESTING CAPTIONS",
+					active: false
+				}, {
+					img: base + "take-pictures.PNG",
+					caption: "TESTING CAPTIONS",
+					active: false
+				}, {
+					img: base + "solved-list.PNG",
+					caption: "TESTING CAPTIONS",
+					active: false
+				}, {
+					img: base + "recommend-vote.PNG",
+					caption: "TESTING CAPTIONS",
+					active: false
+				}, {
+					img: base + "photo-album.PNG",
+					caption: "TESTING CAPTIONS",
+					active: false
+				}, {
+					img: base + "leaderboard-stats.png",
+					caption: "TESTING CAPTIONS",
+					active: false
+			}];
+			
+			return images;
+		},
+		active: function() {
+			return this.active;
+		}
     });
 	
 	
@@ -835,9 +882,14 @@ if (Meteor.isServer) {
 	******************************************************************************/
 	var geo = new GeoCoder();
 	
-	var placeNames = ["Sydney Opera House", "Stanford University", "Statue of Liberty New York", "Taj Mahal", 
-		"The Colosseum", "Stonehenge", "The Golden Gate Bridge", "The Eiffel Tower, Paris France",
-		"Machu Picchu in Peru", "Big Ben in London", "Tower of Pisa, Italy"];
+	var placeNames = ["Sydney Opera House", "Stanford University", "Statue of Liberty New York",
+		"Taj Mahal", "The Colosseum", "Stonehenge", "The Golden Gate Bridge", "The Eiffel Tower, Paris France",
+		"The Pyramids of Giza in Egypt", "Machu Picchu in Peru", "Big Ben in London", "Tower of Pisa, Italy", 
+		"Loch Ness in Scotland", "Mont St. Michel in France", "Agia Sophia in Istanbul, Turkey", 
+		"Brandenburg Gate in Berlin, Germany", "Acropolis of Athens, Greece", "Mount Fuji in Japan", 
+		"Capitol Hill in Washington DC",  "The Grand Canyon in Arizona", "Trevi Fountain in Rome, Italy", 
+		"Chichen Itza in Mexico", "Forbidden City in Beijing", "Millau Bridge in France", 
+		"Hollywood Sign in Los Angeles"];
 
 	var baseURL = "https://maps.googleapis.com/maps/api/staticmap?zoom=18&maptype=satellite&center=";
 	
