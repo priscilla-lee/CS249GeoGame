@@ -8,7 +8,7 @@ All of the code in these files were written by me. I relied on d3 examples
 by Mike Bostock, and I am also using meteor packages written by other 
 developers. I also took a specific "zoom to fov" formula from a google
 forum thread "https://groups.google.com/forum/#!topic/google-maps-js-api-v3/uqKfg0ZBhWc"
-to help me calculate an fov value for static google maps images.
+to help me calculate an fov value for static google maps images. 
 */
 
 Places = new Mongo.Collection('places');
@@ -77,37 +77,35 @@ if (Meteor.isClient) {
         carouselImages: function() {
 			var base = "http://cs.wellesley.edu/~plee3/cs249/IP/screenshots/"
 			var images = [{
-					img: base + "menu-buttons.PNG",
-					caption: "TESTING CAPTIONS",
-					active: true
-				}, {
 					img: base + "game-play.PNG",
-					caption: "TESTING CAPTIONS",
-					active: false
+					caption: "Explore and find places around the world!",
+					active: true,
+					background: "rgba(51,122,183,0.9)"
 				}, {
 					img: base + "game-success.PNG",
-					caption: "TESTING CAPTIONS",
-					active: false
+					caption: "Win points and solve all the challenges!",
+					active: false,
+					background: "rgba(92,184,92,0.9)"
 				}, {
 					img: base + "take-pictures.PNG",
-					caption: "TESTING CAPTIONS",
-					active: false
-				}, {
-					img: base + "solved-list.PNG",
-					caption: "TESTING CAPTIONS",
-					active: false
+					caption: "Take pictures along the way!",
+					active: false,
+					background: "rgba(51,122,183,0.9)"
 				}, {
 					img: base + "recommend-vote.PNG",
-					caption: "TESTING CAPTIONS",
-					active: false
+					caption: "Recommend and upvote to add more places to the game!",
+					active: false,
+					background: "rgba(240,173,78,0.9)"
 				}, {
 					img: base + "photo-album.PNG",
-					caption: "TESTING CAPTIONS",
-					active: false
+					caption: "Manage a photo album of your travel adventures!",
+					active: false,
+					background: "rgba(51,122,183,0.9)"
 				}, {
 					img: base + "leaderboard-stats.png",
-					caption: "TESTING CAPTIONS",
-					active: false
+					caption: "Rank in the top10 to be featured on the leaderboard!",
+					active: false,
+					background: "rgba(91,192,222,0.9)"
 			}];
 			
 			return images;
@@ -229,10 +227,22 @@ if (Meteor.isClient) {
 	  
 	  
     /******************************************************************************
-    * GOOGLE MAPS Loading
+    * METEOR STARTUP: load google maps & google fonts
     ******************************************************************************/
 	Meteor.startup(function() {
+		//load google maps
 		GoogleMaps.load();
+
+		//load web fonts
+		WebFont.load({
+			google: {
+				families: ['Fredericka the Great', 'Open Sans']
+			}
+			// ,
+			// active: function() {
+				// // Font's have loaded.. Do something!
+			// }
+		});	
 	});
 
 	

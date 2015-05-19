@@ -124,3 +124,91 @@
 .normalPlayer, .normalPlayer:hover{
  background-color: #c1d7e9 !important;
 }
+
+.carousel-caption {
+	width: 100% !important;
+	position: absolute !important;
+	bottom: 0px !important;
+	left: 0px !important;
+	height: 22.2% !important;
+	font-size: 150% !important;
+}
+
+.world-explorer {
+	font-family: "Fredericka the Great" !important;
+}
+
+.navbar-header > .world-explorer {
+	font-size: 200% !important;
+}
+
+.world-explorer > .world {
+	color: #5cb85c !important;
+}
+
+.world-explorer > .explorer {
+	color: #5bc0de !important;
+}
+
+#open-sans {
+	font-family: "Open Sans" !important;
+	font-size: 200% !important;
+	line-height: 150% !important;
+}
+
+p > .highlight {
+	color: #5bc0de !important;
+	font-weight: bold !important;
+}
+
+#instructions-panels {
+	font-size: 125% !important;
+}
+
+#instructions-panels .panel-heading {
+	color: white !important;
+}
+
+.bright-info {
+	border-color: #5bc0de !important;
+}
+
+.bright-info > .panel-heading {
+	background-color: #5bc0de !important;
+}
+
+.bright-success {
+	border-color: #5cb85c !important;
+}
+
+.bright-success > .panel-heading {
+	background-color: #5cb85c !important;
+}
+
+.bright-warning {
+	border-color: #f0ad4e !important;
+}
+
+.bright-warning > .panel-heading {
+	background-color: #f0ad4e !important;
+}
+
+.highlight-info {
+	font-weight: bold !important;
+	color: #5bc0de !important;
+}
+
+.highlight-primary {
+	font-weight: bold !important;
+	color: #337ab7 !important;
+}
+
+.highlight-success {
+	font-weight: bold !important;
+	color: #5cb85c !important;
+}
+
+.highlight-warning {
+	font-weight: bold !important;
+	color: #f0ad4e !important;
+}

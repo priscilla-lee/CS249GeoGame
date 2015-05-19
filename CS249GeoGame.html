@@ -1,5 +1,5 @@
 <head>
-    <title>CS249GeoGame</title>
+    <title>WorldExplorer</title>
 </head>
 
 
@@ -21,12 +21,12 @@
 
 
 <!---------------------------------------------------------------------------------------------
-| PLSLOGIN Template: short description about GeoGame, and prompts user to log in                
+| PLSLOGIN Template: short description about WorldExplorer, and prompts user to log in                
 ---------------------------------------------------------------------------------------------->
 <template name="plsLogin">
 	{{> nav}}
 	
-	<div id="carousel-example-generic" class="carousel slide col-md-7" data-ride="carousel">
+	<div id="carousel-example-generic" class="carousel slide col-md-7" data-interval="3500" data-ride="carousel">
 		<!-- Indicators -->
 		<ol class="carousel-indicators">
 			<li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
@@ -39,7 +39,7 @@
 			{{#each carouselImages}}
 			<div class="item {{#if active}}active{{/if}}">
 				<img src="{{this.img}}">
-				<div class="carousel-caption">{{this.caption}}</div>
+				<div class="carousel-caption" style="background-color: {{this.background}}">{{this.caption}}</div>
 			</div>
 			{{/each}}
 		</div>
@@ -54,9 +54,14 @@
 			<span class="sr-only">Next</span>
 		</a>
 	</div>
-	<div class="col-md-5">
-		Geography Game
-		Please log in!
+	<div class="col-md-5 jumbotron" style="background-color: white">
+		<h1 class="world-explorer"><span class="world">World</span><span class="explorer">Explorer</span></h1>
+		<p id="open-sans" class="lead">
+			Want to <span class="highlight">travel</span> the world? 
+			Take <span class="highlight">pictures</span> along the way and explore famous sites and landmarks? 
+			<span class="highlight">Join</span> the game, and you can 
+			<span class="highlight">learn</span> more about the amazing world we live in!
+		</p>
 	</div>
 </template>
 
@@ -68,7 +73,9 @@
 <template name="nav">
 	<div class="navbar navbar-default" role="navigation">
 		<div class="navbar-header">
-			<a class="navbar-brand pointer">Geo Game</a>
+			<a class="navbar-brand pointer world-explorer">
+				<span class="world">World</span><span class="explorer">Explorer</span>
+			</a>
 		</div>
 		<div class="navbar-collapse collapse">
 			<ul class="nav navbar-nav navbar-right">{{> loginButtons}}</ul>
@@ -399,12 +406,66 @@
 			<h4 class="modal-title" id="myModalLabel">Instructions</h4>
 		  </div>
 		  <div class="modal-body">
-			Instructions will go here...The goal of the game is to explore the 
-			zoomable google maps window (on the right) until its image matches the 
-			static image of the famous place (on the left). 
+			<div class="container-fluid">
+			<div class="row" id="instructions-panels">
+				<div class="col-md-3">
+					<div class="panel panel-info bright-info">
+						<div class="panel-heading">Play Game</div>
+						<div class="panel-body">
+							The goal of the game is to <span class="highlight-info">zoom</span> 
+							into your map until it matches the static image on the left. To score extra 
+							points, work as <span class="highlight-info">fast</span> as you can and 
+							take many <span class="highlight-info">pictures</span> along the way!
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="panel panel-primary">
+						<div class="panel-heading">Stats</div>
+						<div class="panel-body">
+							Climb your way up to the <span class="highlight-primary">top10</span> 
+							leaderboard and see how you compare to other players on a personalized 
+							<span class="highlight-primary">scatterplot</span>!
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="panel panel-success bright-success">
+						<div class="panel-heading">Recommend</div>
+						<div class="panel-body">
+							<span class="highlight-success">Recommend</span> new places, 
+							and <span class="highlight-success">upvote</span> others. Once a place has reached
+							<span class="highlight-success">5 votes</span>, it will be added to the game!
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="panel panel-warning bright-warning">
+						<div class="panel-heading">Photo Album</div>
+						<div class="panel-body">
+							While solving challenges, you can take street view 
+							<span class="highlight-warning">pictures</span> and view them later in 
+							your photo album. You can even <span class="highlight-warning">download</span> 
+							them to save!
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="panel panel-default">
+						<div class="panel-heading">Credits & Acknowledges</div>
+						<div class="panel-body">
+							WorldExplorer was created by Priscilla Lee for CS249 Web Mashups (S'15). This
+							game relies on MeteorJS, MongoDB, Bootstrap, D3JS, and the Google Maps API.
+						</div>
+					</div>
+				</div>
+			</div>
+			</div>
 		  </div>
 		  <div class="modal-footer">
-			<button type="button" class="btn btn-primary" data-dismiss="modal">Got it</button>
+			<button type="button" class="btn btn-danger" data-dismiss="modal">Got it</button>
 		  </div>
 		</div>
 	  </div>
