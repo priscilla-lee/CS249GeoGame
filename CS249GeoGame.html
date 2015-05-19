@@ -2,6 +2,8 @@
     <title>CS249GeoGame</title>
 </head>
 
+
+
 <!---------------------------------------------------------------------------------------------
 | BODY: prompts user to log in, if already logged in then displays home menu or plays game               
 ---------------------------------------------------------------------------------------------->
@@ -16,6 +18,8 @@
 	</div>
 </body>
 
+
+
 <!---------------------------------------------------------------------------------------------
 | PLSLOGIN Template: short description about GeoGame, and prompts user to log in                
 ---------------------------------------------------------------------------------------------->
@@ -26,6 +30,8 @@
 		<p>Please log in.</p>
 	</div>
 </template>
+
+
 
 <!---------------------------------------------------------------------------------------------
 | NAV Template: Just the game name & the login buttons                  
@@ -41,6 +47,8 @@
 	</div>
 </template>
 
+
+
 <!---------------------------------------------------------------------------------------------
 | HOME Template: displays game's home menu buttons               
 ---------------------------------------------------------------------------------------------->
@@ -54,6 +62,8 @@
 		{{> instructions}}
 	</div>
 </template>
+
+
 
 <!---------------------------------------------------------------------------------------------
 | GAME Template: displays the game (static map, street view, map canvas, and game buttons)                  
@@ -73,6 +83,8 @@
 	{{> next}}
 </template>
 
+
+
 <!---------------------------------------------------------------------------------------------
 | MAP Template: Google Maps map canvas                
 ---------------------------------------------------------------------------------------------->
@@ -81,6 +93,8 @@
     {{> googleMap name="map" options=mapOptions}}
   </div>
 </template>
+
+
 
 <!---------------------------------------------------------------------------------------------
 | STREET VIEW Template: Google Maps street view panorama (plus a picture button)                  
@@ -95,6 +109,8 @@
   </div>
 </template>
 
+
+
 <!---------------------------------------------------------------------------------------------
 | GAME BUTTONS Template: the row of buttons on bottom of screen when playing the game                 
 ---------------------------------------------------------------------------------------------->
@@ -107,6 +123,8 @@
 	</div>
 	{{> list}}
 </template>
+
+
 
 <!---------------------------------------------------------------------------------------------
 | PIC Template: a simple modal that only contains the static image of the picture taken                  
@@ -122,6 +140,8 @@
 	  </div>
 	</div>
 </template>
+
+
 
 <!---------------------------------------------------------------------------------------------
 | LIST Template: modal that allows users to see the challenges they've solved                  
@@ -156,6 +176,8 @@
 	</div>
 </template>
 
+
+
 <!---------------------------------------------------------------------------------------------
 | NEXT Template: modal that pops up when user has completed a puzzle                  
 ---------------------------------------------------------------------------------------------->
@@ -189,6 +211,8 @@
 	  </div>
 	</div>
 </template>
+
+
 
 <!---------------------------------------------------------------------------------------------
 | STATS Template: displays the top10 leaderboard & a d3 scatterplot                  
@@ -235,12 +259,16 @@
 	</div>
 </template>
 
+
+
 <!---------------------------------------------------------------------------------------------
 | D3 VISUALIZATIONS Template: will contain a scatterplot                  
 ---------------------------------------------------------------------------------------------->
 <template name="d3">
 	<div class="well" style="height: 100%" id="d3container"></div>
 </template>
+
+
 
 <!---------------------------------------------------------------------------------------------
 | RECOMMEND Template: a modal that allows users to recommend more places to add to the game                  
@@ -286,6 +314,8 @@
 	</div>
 </template>
 
+
+
 <!---------------------------------------------------------------------------------------------
 | PHOTO ALBUM Template: a modal that allows users to view the pictures they've taken                  
 ---------------------------------------------------------------------------------------------->
@@ -319,6 +349,8 @@
 	  </div>
 	</div>
 </template>
+
+
 
 <!---------------------------------------------------------------------------------------------
 | INSTRUCTIONS Template: modal that explains the instructions for this game                  

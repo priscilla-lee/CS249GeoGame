@@ -14,7 +14,9 @@ to help me calculate an fov value for static google maps images.
 Places = new Mongo.Collection('places');
 var markers = {};
 
+
 if (Meteor.isClient) {
+	//hide the next modal 
 	$('#nextModal').modal({ show: false});
 	
     /******************************************************************************
@@ -29,13 +31,21 @@ if (Meteor.isClient) {
     Session.set('picsTaken', 0);
     Meteor.setInterval(function() {Session.set('now', new Date());}, 100);
     Session.set('pauseTime', true);
-	Meteor.call("nextRandomPlace", Meteor.userId(), function(error, result) {
-		console.log("next random place result: " + result);
-		Session.set("currentPlace", result);	
+	
+	//call next random place when user logs in
+	Tracker.autorun(function() {
+		if (Meteor.user()) {
+			Meteor.call("nextRandomPlace", Meteor.userId(), function(error, result) {
+				console.log("next random place result: " + result);
+				Session.set("currentPlace", result);	
+			});
+		}
 	});
 	
+	
+	
 	/******************************************************************************
-    * GameDone: checks if user has solved all available challenges
+    * FUNCTION gameDone: checks if user has solved all available challenges
     ******************************************************************************/
     function gameDone() {
         var numSolved, numTotal;
@@ -50,6 +60,8 @@ if (Meteor.isClient) {
         return (numSolved >= numTotal);  
     }
     
+	
+	
     /******************************************************************************
     * BODY Template
     ******************************************************************************/
@@ -57,6 +69,8 @@ if (Meteor.isClient) {
         displayHome: function() {return Session.get('currentPage')=='home';},
         displayGame: function() {return Session.get('currentPage')=='game';},
     });
+	
+	
 	
     /******************************************************************************
     * HOME Template
@@ -77,18 +91,18 @@ if (Meteor.isClient) {
 		}
     });
 	
+	
+	
     /******************************************************************************
     * GAME Template
     ******************************************************************************/
 	Template.game.helpers({
 		staticmap: function() {
-			var name = Session.get('currentPlace');
-			var place = Places.findOne({name:name});
+			var place = Places.findOne({name: Session.get('currentPlace')});
 			return place.staticMap;
 		},
 		streetview: function() {
-			var name = Session.get('currentPlace');
-			var place = Places.findOne({name:name});
+			var place = Places.findOne({name: Session.get('currentPlace')});
 			return place.streetView;
 		},
 		displaySM: function() {
@@ -104,15 +118,19 @@ if (Meteor.isClient) {
         }
 	});
 
+	
+	
     /******************************************************************************
     * GOOGLE MAPS Template
     ******************************************************************************/
 	Template.map.onCreated(function() {
 		GoogleMaps.ready('map', function(map) {
+			//every time the center of the map is changed, CHECK IT
 			google.maps.event.addListener(map.instance, 'center_changed', function(event) {
 				var answer = Places.findOne({name:Session.get('currentPlace')}).geocode;
 				var player = map.instance.center;
 				
+				//if center is "close enough", show the NEXT MODAL & reset values
 				Meteor.call("checkCenter", answer, player, function(error, result) {
 					var distance = result;	
 					var zoom = GoogleMaps.maps.map.instance.getZoom();
@@ -122,82 +140,99 @@ if (Meteor.isClient) {
                         Session.set("solved", new Date());
                         Session.set("pauseTime", true);
                     }
-					
 				});
 			});
 			
+			//adds the markers to the map
 			Places.find().observe({
 				added: function (document) {
-                    if (document.recommended >= 5 ) {		
-                      var marker = new google.maps.Marker({
-                        animation: google.maps.Animation.DROP,
-                        position: new google.maps.LatLng(document.lat, document.lng),
-                        map: map.instance,
-                        id: document._id,
-                        icon: "https://storage.googleapis.com/support-kms-prod/SNP_2752125_en_v0"
-                      });
-                        
-                        google.maps.event.addListener(marker, "dblclick", function(e) {
-                            var map = GoogleMaps.maps.map.instance;
-                            map.setZoom(14);
-                            map.setCenter(marker.position);
-                        });
+                    if (document.recommended >= 5 ) {
+						//create marker (default: red icon for unsolved)
+						var marker = new google.maps.Marker({
+							animation: google.maps.Animation.DROP,
+							position: new google.maps.LatLng(document.lat, document.lng),
+							map: map.instance,
+							id: document._id,
+							icon: "https://storage.googleapis.com/support-kms-prod/SNP_2752125_en_v0"
+						});
 
-                    if (Meteor.user()) {
-                        var solved = Meteor.user().profile.solvedNames;
-                          if (solved && solved.indexOf(document.name)!=-1 ) {
-                              //document.solvedBy.indexOf(Meteor.userId())!=-1) {
-                            marker.setIcon("https://storage.googleapis.com/support-kms-prod/SNP_2752129_en_v0");
-                          }
-                    }
+						//if marker is double clicked, zoom in 
+						google.maps.event.addListener(marker, "dblclick", function(e) {
+							var map = GoogleMaps.maps.map.instance;
+							map.setZoom(14);
+							map.setCenter(marker.position);
+						});
 
-                      markers[document._id] = marker;
+						//if marker is solved, change its icon to green
+						if (Meteor.user()) {
+							var solved = Meteor.user().profile.solvedNames;
+							if (solved && solved.indexOf(document.name)!=-1 ) {
+								marker.setIcon("https://storage.googleapis.com/support-kms-prod/SNP_2752129_en_v0");
+							}
+						}
+
+						//add marker to dictionary
+						markers[document._id] = marker;
                     }
 				}
 			});
 		});
 	  });
-
       
+	  
+	  
     /******************************************************************************
     * GOOGLE MAPS Loading
     ******************************************************************************/
-	  Meteor.startup(function() {
+	Meteor.startup(function() {
 		GoogleMaps.load();
-	  });
+	});
 
+	
+	  
     /******************************************************************************
-    * GOOGLE MAPS Options
+    * GOOGLE MAP CANVAS Options
     ******************************************************************************/
-	  Template.map.helpers({
+	Template.map.helpers({
 		mapOptions: function() {
-		  if (GoogleMaps.loaded()) {
-			return {
-			  center: {lat:0, lng:0},
-		      zoom: 1,
-			  mapTypeId: google.maps.MapTypeId.SATELLITE
-			};
-		  }
+			if (GoogleMaps.loaded()) {
+				return {
+					center: {lat:0, lng:0},
+					zoom: 1,
+					mapTypeId: google.maps.MapTypeId.SATELLITE
+				};
+			}
 		}
-	  });
+	});
 
+	
+
+	/******************************************************************************
+    * GOOGLE MAP STREET VIEW Options
+    ******************************************************************************/
 	Template.streetView.helpers({
 		mapOptions: function() {
 			if (GoogleMaps.loaded()) {
-					var name = Session.get('currentPlace');
-					var place = Places.findOne({name:name});
-					return {
-						position: {lat: place.geocode.latitude, lng: place.geocode.longitude}
-					};
+				var name = Session.get('currentPlace');
+				var place = Places.findOne({name:name});
+				return {
+					position: {
+						lat: place.geocode.latitude, 
+						lng: place.geocode.longitude
+					}
+				};
 			}
 		}
 	});  
+	
+	
 	
     /******************************************************************************
     * STREET VIEW Template
     ******************************************************************************/
 	Template.streetView.events({
 		"click #picBtn": function() {
+			//retrieving fields from street view instance
 			var sv = GoogleMaps.maps.streetView.instance;	
 			var URL = "https://maps.googleapis.com/maps/api/streetview?size=600x400";
 			URL += "&pano=" + sv.pano;
@@ -211,21 +246,23 @@ if (Meteor.isClient) {
 			if (fov > 120) {fov = 120;}			
 			URL += "&fov=" + fov;
 
+			//display picture in modal
 			Session.set("pic", URL);
 			$('#picModal').modal('show');
 			
+			//add picture to user's collection
             Meteor.users.update(Meteor.userId(), {$push: {"profile.pictures": {
                 name: Session.get("currentPlace"),
                 pic: URL
             }}});
         
+			//keep count of pictures taken
             Session.set('picsTaken', Session.get('picsTaken')+1);
 		}
 	});
 	
+
 	
-	
-    
     /******************************************************************************
     * GAME BUTTONS Template
     ******************************************************************************/
@@ -241,6 +278,7 @@ if (Meteor.isClient) {
         time: function() {
             if (Session.get("pauseTime")) return "---";
             
+			//display time (like a clock timer)
             var play = Session.get("clickPlay").getTime();
 			var next = Session.get("clickNext").getTime();
             var now = Session.get("now").getTime();
@@ -267,6 +305,7 @@ if (Meteor.isClient) {
 				Session.set("currentView", "static");
 			}
 			
+			//timeout because sometimes there's a lag
 			setTimeout(function(){ 
 				var sv = GoogleMaps.maps.streetView.instance;
 				place = Places.findOne({name:Session.get('currentPlace')});
@@ -280,6 +319,8 @@ if (Meteor.isClient) {
 		}
     });
 	
+	
+	
     /******************************************************************************
     * PIC Template
     ******************************************************************************/
@@ -288,8 +329,7 @@ if (Meteor.isClient) {
 			return Session.get("pic");
 		}
 	});
-	
-	
+
 	
 	
     /******************************************************************************
@@ -330,6 +370,7 @@ if (Meteor.isClient) {
             return Session.get('currentPlace');
         },
 		milliseconds: function() {
+			//calculate the amount of time it took to solve puzzle
 			var play = Session.get("clickPlay").getTime();
 			var next = Session.get("clickNext").getTime();
 			var solved = Session.get("solved").getTime();
@@ -415,9 +456,8 @@ if (Meteor.isClient) {
 		}
 	}); 
     
-    
+
 	
-    
     /******************************************************************************
     * STATS Template
     ******************************************************************************/
@@ -428,7 +468,7 @@ if (Meteor.isClient) {
             //array of top 10 players
             var top10 = [];
             
-            //get user rank
+            //SETUP: get user rank
             function getUserRank() {
                 for (var i in sorted) {
                     if (sorted[i].username == Meteor.user().username) 
@@ -437,81 +477,69 @@ if (Meteor.isClient) {
                 return -1;
             }
 
-            //returns player of specified rank number
-              function getPlayerNum(num) {
-                  var sorted = Meteor.users.find({}, {sort: {"profile.score": -1}}).fetch();
-                  var player = sorted[num-1];
-                  return player;
-              }
+            //SETUP: returns player of specified rank number
+			function getPlayerNum(num) {
+				var sorted = Meteor.users.find({}, {sort: {"profile.score": -1}}).fetch();
+				var player = sorted[num-1];
+				return player;
+			}
 
-              //given array of solve times (in milliseconds), returns average solve time
-              function getAvgTime(array) {
-                  var sum = 0;
-                  for (var i in array) { sum += array[i]; }
-                  var avgMill = (sum / array.length);
-                  var avgSec = avgMill/1000;
-                  return Math.round( avgSec * 10) / 10; //rounded to 1 dec place
-              }
+			//SETUP: given array of solve times (in milliseconds), returns average solve time
+			function getAvgTime(array) {
+				var sum = 0;
+				for (var i in array) { sum += array[i]; }
+				var avgMill = (sum / array.length);
+				var avgSec = avgMill/1000;
+				return Math.round( avgSec * 10) / 10; //rounded to 1 dec place
+			}
             
+			//SETUP: create player object to add to top10 from the given p and rank
             function createPlayer(p, rank) {
-                var player;
-                
-                if (p && p.profile.solvedTimes) {
-                    player = {
-                        username: p.username,
-                        rank: rank,
-                        name: p.profile.firstName + " " + p.profile.lastName,
-                        score: p.profile.score,
-                        avgTime: getAvgTime(p.profile.solvedTimes)
-                    }
-                } else if (p) {
-                    player = {
-                        username: p.username,
-                        rank: rank,
-                        name: p.profile.firstName + " " + p.profile.lastName,
-                        score: "---",
-                        avgTime: "---"
-                    } 
-                } else {
-                    player = {
-                        username: undefined,
-                        rank: rank,
-                        name: "---",
-                        score: "---",
-                        avgTime: "---"
-                    } 
+				//if p doesn't exist, return a "blank" object
+				if (!p) return {username: undefined, rank: rank, name: "---", score: "---", avgTime: "---"};
+				
+				//create player with information
+				var player = {
+					username: p.username,
+					rank: rank,
+					name: p.profile.firstName + " " + p.profile.lastName,
                 }
+                
+				//add score & time information
+                if (p.profile.solvedTimes) {
+                    player.score = p.profile.score;
+                    player.avgTime = getAvgTime(p.profile.solvedTimes);
+				} else {
+					player.score = "---";
+					player.avgTime = "---";
+				}
+				
                 return player;
             }
             
+			//SETUP: return true if player given is the same as current user
             function isUser(player) {
                 return (player && Meteor.user().username==player.username);
             }
             
+			//GO AHEAD AND DO: add players to the top 10
             if (getUserRank() > 10) {
-                for (var i = 1; i <= 9 ; i++) { //get top 9
-                    var p = getPlayerNum(i);   
-                    var player = createPlayer(p, i);
-                    
+				//then add top 9 and THEN add user
+                for (var i = 1; i <= 9 ; i++) {  
+                    var player = createPlayer(getPlayerNum(i), i);
                     if (i <= 5) player.class = "info";
                     else player.class = "normalPlayer";
-                    
-                    top10.push(player);
+                    top10.push(player); //push top 9
                 } 
-                
-                //add user
                 var user = createPlayer(Meteor.user(), getUserRank());
                 user.class = "warning";
-                top10.push(user);    
-            } else {
-                for (var i = 1; i <= 10 ; i++) { //get top 10
-                    var p = getPlayerNum(i);   
-                    var player = createPlayer(p, i);
-                    
-                    if ( isUser(p) ) player.class = "warning";
+                top10.push(user); //then push user
+            } else { //then just add the top 10
+                for (var i = 1; i <= 10 ; i++) {
+                    var player = createPlayer(getPlayerNum(i), i);
+                    if ( isUser(getPlayerNum(i)) ) player.class = "warning";
                     else if (i <= 5) player.class = "info";
                     else player.class = "normalPlayer";
-                    
                     top10.push(player);
                 } 
             }
@@ -522,78 +550,67 @@ if (Meteor.isClient) {
     
     Template.stats.events({
 		"click #viewStats": function() {
-            setTimeout(function(){createD3Visualization();}, 500);
+            setTimeout(function(){
+				var players = getPlayersForD3();
+				showScatterPlot(players);
+			}, 500);
         },
-        "mouseover td": function() {
+        "mouseover td": function() { //hover, then enlarge dot in d3 scatterplot
             if (this.username) { d3.select("#" + this.username).attr("r", 20); }      
         }, "mouseleave td": function() {
             if (this.username) { d3.select("#" + this.username).attr("r", 5); }      
         }
     });
-	
-	
-	
-	
+
     
+	
     /******************************************************************************
-    * D3 Template
+    * FUNCTION showScatterPlot: takes in data, and displays d3 scatterplot
     ******************************************************************************/
-    
-    
     function showScatterPlot(data) {
         $("#d3container").empty();
-        
-        // just to have some space around items. 
-        var margins = {
-            "left": 40,
-                "right": 30,
-                "top": 30,
-                "bottom": 30
-        };
 
-        var width = (document.getElementById("d3container").offsetWidth)*(0.95); //500;
-        var height = (document.getElementById("highScoreTable").offsetHeight) - 30; //300;
+		//set margins & width
+        var margins = {"left": 50, "right": 30, "top": 30,"bottom": 30};
+        var width = (document.getElementById("d3container").offsetWidth)*(0.95);
+        var height = (document.getElementById("highScoreTable").offsetHeight) - 30;
 
-        // this will be our colour scale. An Ordinal scale.
-        //var colors = d3.scale.category10();
-        
+		//specific colors for different player types
         var colors = {
             "top5": "#5bc0de",
             "user": "#f0ad4e",
             "none": "#337ab7"
-//            "HS": "#5bc0de",
-//            "You": "#f0ad4e",
-//            "Normal": "#337ab7"
         }
 
-        // we add the SVG component to the scatter-load div
-        var svg = d3.select("#d3container").append("svg").attr("width", width).attr("height", height).append("g")
+        //adding SVG component
+        var svg = d3.select("#d3container").append("svg")
+			.attr("width", width)
+			.attr("height", height)
+			.append("g")
             .attr("transform", "translate(" + margins.left + "," + margins.top + ")");
 
-        // this sets the scale that we're using for the X axis. 
-        // the domain define the min and max variables to show. In this case, it's the min and max scores of items.
-        // this is made a compact piece of code due to d3.extent which gives back the max and min of the score variable within the dataset
+        //d3.extent retrieves the min and max values from the data
         var scoreExtent = d3.extent(data, function (d) {return d.score;});
         var timeExtent = d3.extent(data, function (d) {return d.time;});
         
+		//x scale & y scale
         var x = d3.scale.linear()
             .domain([ scoreExtent[0]-10 , scoreExtent[1]+10 ])
-
-        
-        // the range maps the domain to values from 0 to the width minus the left and right margins (used to space out the visualization)
             .range([0, width - margins.left - margins.right]);
 
-        // this does the same as for the y axis but maps from the time variable to the height to 0. 
         var y = d3.scale.linear()
             .domain([ timeExtent[0]-5 , timeExtent[1]+5 ])
-        // Note that height goes first due to the weird SVG coordinate system
-        .range([height - margins.top - margins.bottom, 0]);
+			.range([height - margins.top - margins.bottom, 0]);
 
-        // we add the axes SVG component. At this point, this is just a placeholder. The actual axis will be added in a bit
-        svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + y.range()[0] + ")");
-        svg.append("g").attr("class", "y axis");
+        //adding x axis & y axis
+        svg.append("g")
+			.attr("class", "x axis")
+			.attr("transform", "translate(0," + y.range()[0] + ")");
+        
+		svg.append("g")
+			.attr("class", "y axis");
 
-        // this is our X axis label. Nothing too special to see here.
+        //x axis label
         svg.append("text")
             .attr("fill", "#414241")
             .attr("text-anchor", "end")
@@ -601,148 +618,116 @@ if (Meteor.isClient) {
             .attr("y", height - 30)
             .text("Total score (pts)");
         
+		//y axis label
         svg.append("text")
             .attr("fill", "#414241")
             .attr("text-anchor", "end")
             .attr("transform", "rotate(-90)")
-            .attr("x", 0) //width / 2)
-            .attr("y", height/2 - 215) //height - 35)
+            .attr("x", 0) 
+            .attr("y", height/2 - 215)
             .text("Average solve time (sec)");
 
-
-        // this is the actual definition of our x and y axes. The orientation refers to where the labels appear - for the x axis, 
-        //below or above the line, and for the y axis, left or right of the line. Tick padding refers to how much space between 
-        //the tick and the label. There are other parameters too - see https://github.com/mbostock/d3/wiki/SVG-Axes for more information
+		//axes ticks and numbers
         var xAxis = d3.svg.axis().scale(x).orient("bottom").tickPadding(2);
         var yAxis = d3.svg.axis().scale(y).orient("left").tickPadding(2);
 
-        // this is where we select the axis we created a few lines earlier. See how we select the axis item. in our svg we appended 
-        //a g element with a x/y and axis class. To pull that back up, we do this svg select, then 'call' the appropriate axis object 
-        //for rendering.    
+        //finish axes  
         svg.selectAll("g.y.axis").call(yAxis);
         svg.selectAll("g.x.axis").call(xAxis);
         
-    
-        // now, we can get down to the data part, and drawing stuff. We are telling D3 that all nodes (g elements with class node) 
-        //will have data attached to them. The 'key' we use (to let D3 know the uniqueness of items) will be the name. Not usually 
-        //a great key, but fine for this example.
+        //working with actual data now
         var players = svg.selectAll("g.node").data(data, function (d) {
             return d.name;
         });
 
-        // we 'enter' the data, making the SVG group (to contain a circle and text) with a class node. This corresponds with 
-        //what we told the data it should be above.
-
+		//entering the data (will contain circle & text)
         var playersGroup = players.enter().append("g")
-            //.attr("class", function(d) {return d.type + " node";})
-        // this is how we set the position of the items. 
-        //Translate is an incredibly useful function for rotating and positioning items 
             .attr('transform', function (d) {
                 return "translate(" + x(d.score) + "," + y(d.time) + ")";
-            });
+            }); //setting position of each item
 
-        //BACKGROUND CIRCLE
+        //appending BACKGROUND circles (to be enlarged upon mouse hover later) 
         playersGroup.append("circle")
             .attr("r", 5)
             .attr("class", "dot")
             .attr("id", function(d) {return d.username;})
             .attr("opacity", 0.25)
-            .style("fill", function (d) {
-                // remember the ordinal scales? We use the colors scale to get a colour for our type. Now each node will be coloured
-                // by who makes the players. 
-                return colors[d.type]; //(d.type);
-        });
+            .style("fill", function (d) {return colors[d.type];});
         
-        //ACTUAL CIRCLE
+        //appending ACTUAL circles
         playersGroup.append("circle")
             .attr("r", 5)
             .attr("class", "dot")
-            .style("fill", function (d) {
-                // remember the ordinal scales? We use the colors scale to get a colour for our type. Now each node will be coloured
-                // by who makes the players. 
-                return colors[d.type]; //(d.type);
-        });
+            .style("fill", function (d) {return colors[d.type];});
 
-        // now we add some text, so we can see what each item is.
+        //appending text
         playersGroup.append("text")
             .style("text-anchor", "middle")
             .attr("dy", -10)
-            //.attr("class", function(d) {return d.type;})
             .text(function (d) {
-                // this shouldn't be a surprising statement.
                 if (d.type != "none") return d.name;
-                else return "";
+                else return ""; //no text if not one of the top 5
             });
     }    
     
-    function createD3Visualization() {
+	
+	/******************************************************************************
+    * FUNCTION getPlayersForD3: returns array of players to be used for d3 scatterplot
+    ******************************************************************************/
+    function getPlayersForD3() {
         //array of player objects to be used for d3
-          var players = [];
+        var players = [];
 
-        //returns player of specified rank number
-          function getPlayerNum(num) {
-              var sorted = Meteor.users.find({}, {sort: {"profile.score": -1}}).fetch();
-              var player = sorted[num-1];
-              return player;
-          }
+        //SETUP: returns player of specified rank number
+		function getPlayerNum(num) {
+			var sorted = Meteor.users.find({}, {sort: {"profile.score": -1}}).fetch();
+			var player = sorted[num-1];
+			return player;
+		}
 
-          //given array of solve times (in milliseconds), returns average solve time
-          function getAvgTime(array) {
-              var sum = 0;
-              for (var i in array) { sum += array[i]; }
-              var avgMill = (sum / array.length);
-              var avgSec = avgMill/1000;
-              return Math.round( avgSec * 10) / 10; //rounded to 1 dec place
-          }
+		//SETUP: given array of solve times (in milliseconds), returns average solve time
+		function getAvgTime(array) {
+			var sum = 0;
+			for (var i in array) { sum += array[i]; }
+			var avgMill = (sum / array.length);
+			var avgSec = avgMill/1000;
+			return Math.round( avgSec * 10) / 10; //rounded to 1 dec place
+		}
 
-          //takes in Meteor.user object and adds appropriate info to array for d3
-          function addPlayer(player, type) {
-              if (player && player.profile.solvedTimes) {
-                  var prof = player.profile;
-                  var d3player = {
-                      username: player.username,
-                      
-                      name: prof.firstName + " " + prof.lastName,
-                      type: type,
-                      score: prof.score,
-                      time: getAvgTime(prof.solvedTimes)
-                  }
-                  players.push(d3player);
-              }
-          }
+		//SETUP: takes in Meteor.user object and adds appropriate info to array for d3
+		function addPlayer(player, type) {
+			if (player && player.profile.solvedTimes) {
+				var prof = player.profile;
+				var d3player = {
+					username: player.username,
+					name: prof.firstName + " " + prof.lastName,
+					type: type,
+					score: prof.score,
+					time: getAvgTime(prof.solvedTimes)
+				}
+				players.push(d3player);
+			}
+		}
 
-          //populate first with current user
-          addPlayer(Meteor.user(), "user");
+		//GO AHEAD AND DO: populate players with user --> top5 --> everyone else
+		addPlayer(Meteor.user(), "user");
+		for (var i = 1; i <=5; i++) {addPlayer(getPlayerNum(i), "top5");}
+		var allPlayers = Meteor.users.find().fetch();
+		for (var i in allPlayers) {addPlayer(allPlayers[i], "none");}
 
-          //populate with top 5 players
-          for (var i = 1; i <=5; i++) {
-              var p = getPlayerNum(i);
-              addPlayer(p, "top5");
-          }
-
-          //populate with rest of players
-          var allPlayers = Meteor.users.find().fetch();
-          for (var i in allPlayers) {
-              var p = allPlayers[i];
-              addPlayer(p, "none");
-          }
-
-        showScatterPlot(players);
+		return players;
     }
-    
-    
-  Template.d3.onRendered(function(){ 
-      
-      
-      //setTimeout(function(){ showScatterPlot(players); }, 1000);
-      $(window).resize(function(evt) {
-          if ( $("#statsModal").hasClass("in") ) {
-              createD3Visualization();
-          }
-      });
-  });  
 
-    
+	Template.d3.onRendered(function(){ 
+		$(window).resize(function(evt) { 
+		//every time window is resized, readjust the scatterplot dimensions
+			if ( $("#statsModal").hasClass("in") ) {
+				var players = getPlayersForD3();
+				showScatterPlot(players);
+			}
+		});
+	});  
+
 	
 	
     /******************************************************************************
@@ -764,13 +749,13 @@ if (Meteor.isClient) {
 	
 	Template.recommend.events({
         "keypress input": function(e) {
-          if (e.which == 13) {
-            var placeName = e.target.value;
-            Meteor.call("recommendPlace", placeName, Meteor.userId(), function(error, result) {
-                if (!result) {alert("That's not a real place, is it? Please try again.");}
-            });
-            e.target.value = ""; //clear form
-          }
+			if (e.which == 13) {
+				var placeName = e.target.value;
+				Meteor.call("recommendPlace", placeName, Meteor.userId(), function(error, result) {
+					if (!result) {alert("That's not a real place, is it? Please try again.");}
+				});
+				e.target.value = ""; //clear form
+			}
         },
 		"click .recPlace": function(e) {
 			var placeName = document.getElementById("placeRec").value;
@@ -795,8 +780,6 @@ if (Meteor.isClient) {
     });
 	
 	
-    
-
 	
     /******************************************************************************
     * PHOTO ALBUM Template
@@ -813,6 +796,8 @@ if (Meteor.isClient) {
        }
     });
 	
+	
+	
 	/******************************************************************************
     * ACCOUNTS Configuration
     ******************************************************************************/
@@ -826,12 +811,12 @@ if (Meteor.isClient) {
 			inputType: 'text',
 			visible: true,
 			validate: function(value, errorFunction) {
-			  if (!value) {
-				errorFunction("Please write your first name");
-				return false;
-			  } else {
-				return true;
-			  }
+				if (!value) {
+					errorFunction("Please write your first name");
+					return false;
+				} else { 
+					return true;
+				}
 			}
 		}, {
 			fieldName: 'lastName',
@@ -840,10 +825,14 @@ if (Meteor.isClient) {
 			visible: true,
 		} ]
 	});  
-	
 }
 
+
+
 if (Meteor.isServer) {
+	/******************************************************************************
+	* FIRST THING TO DO: add places to Mongo collection if empty
+	******************************************************************************/
 	var geo = new GeoCoder();
 	
 	var placeNames = ["Sydney Opera House", "Stanford University", "Statue of Liberty New York", "Taj Mahal", 
@@ -873,6 +862,11 @@ if (Meteor.isServer) {
 		}
 	}
 	
+	
+	
+	/******************************************************************************
+	* METEOR METHODS: recommendPlace, checkCenter, nextRandomPlace
+	******************************************************************************/
 	Meteor.methods({
 		'recommendPlace': function(name, user) {
 			var result = geo.geocode(name)[0];
@@ -882,6 +876,7 @@ if (Meteor.isServer) {
 				var staticMap = baseURL + result.latitude + "," + result.longitude + "&size=600x600";
 				var thumbnail = baseURL + result.latitude + "," + result.longitude + "&size=600x200";
 
+				//adds recommended place to collection
 				Places.insert({
 					name: name, 
 					geocode: result, 
@@ -920,8 +915,10 @@ if (Meteor.isServer) {
 			return (distance.lat + distance.lng);
 		},
 		"nextRandomPlace": function(userId) {
+			//retrieves all unsolved places & selects a random one of those places
 			var all = Places.find({recommended: {$gte: 5}}).fetch();
 			var unsolved = all.filter(function(i) {
+				if (!Meteor.user()) return true;
                 var solved = Meteor.user().profile.solvedNames;
                 return (!solved || solved.indexOf(i.name)==-1);
 			});
