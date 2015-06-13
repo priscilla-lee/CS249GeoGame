@@ -170,8 +170,8 @@ if (Meteor.isClient) {
     ******************************************************************************/
 	Template.map.onCreated(function() {
 		GoogleMaps.ready('map', function(map) {
-			//every time the center of the map is changed, CHECK IT
-			google.maps.event.addListener(map.instance, 'center_changed', function(event) {
+			//function to check
+			function check(event) {
 				var answer = Places.findOne({name:Session.get('currentPlace')}).geocode;
 				var player = map.instance.center;
 				
@@ -186,7 +186,11 @@ if (Meteor.isClient) {
                         Session.set("pauseTime", true);
                     }
 				});
-			});
+			}
+			
+			//every time the center/zoom of the map is changed, CHECK IT
+			google.maps.event.addListener(map.instance, 'center_changed', function(event) {check(event);});
+			google.maps.event.addListener(map.instance, 'zoom_changed', function(event) {check(event);});
 			
 			//adds the markers to the map
 			Places.find().observe({
